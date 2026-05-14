@@ -1,0 +1,374 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.app { padding: 1.5rem 0; }
+.header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.logo { width: 36px; height: 36px; background: #1a6bb5; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.logo svg { width: 22px; height: 22px; }
+.brand { font-size: 26px; font-weight: 500; color: var(--color-text-primary); }
+.brand span { font-size: 15px; font-weight: 400; color: var(--color-text-secondary); margin-left: 6px; }
+.tabs { display: flex; gap: 0; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden; margin-bottom: 1.5rem; }
+.tab { flex: 1; padding: 11px 12px; font-size: 15px; font-weight: 400; cursor: pointer; background: var(--color-background-primary); border: none; color: var(--color-text-secondary); border-right: 0.5px solid var(--color-border-tertiary); transition: background 0.15s; text-align: center; }
+.tab:last-child { border-right: none; }
+.tab.active { background: #1a6bb5; color: #fff; font-weight: 500; }
+.tab:hover:not(.active) { background: var(--color-background-secondary); }
+.section { display: none; }
+.section.active { display: block; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.card-title { font-size: 15px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+.dose-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.dose-table th { text-align: left; padding: 9px 12px; font-weight: 500; font-size: 14px; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+.dose-table td { padding: 10px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: top; }
+.dose-table tr:last-child td { border-bottom: none; }
+.dose-table tr:hover td { background: var(--color-background-secondary); }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+.badge-blue { background: #e6f1fb; color: #0c447c; }
+.badge-amber { background: #faeeda; color: #633806; }
+.badge-red { background: #fcebeb; color: #501313; }
+.badge-green { background: #eaf3de; color: #27500a; }
+.risk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 1rem; }
+.risk-card { padding: 16px; border-radius: var(--border-radius-md); border: 0.5px solid; }
+.risk-low { background: #eaf3de; border-color: #c0dd97; }
+.risk-mod { background: #faeeda; border-color: #fac775; }
+.risk-high { background: #fcebeb; border-color: #f7c1c1; }
+.risk-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+.risk-low .risk-title { color: #27500a; }
+.risk-mod .risk-title { color: #633806; }
+.risk-high .risk-title { color: #501313; }
+.risk-dose { font-size: 18px; font-weight: 500; }
+.risk-low .risk-dose { color: #3b6d11; }
+.risk-mod .risk-dose { color: #854f0b; }
+.risk-high .risk-dose { color: #a32d2d; }
+.risk-note { font-size: 13px; margin-top: 6px; }
+.risk-low .risk-note { color: #3b6d11; }
+.risk-mod .risk-note { color: #854f0b; }
+.risk-high .risk-note { color: #a32d2d; }
+.calc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+.field-label { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.field-val { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.result-box { background: #e6f1fb; border: 0.5px solid #b5d4f4; border-radius: var(--border-radius-md); padding: 16px 18px; margin-top: 12px; }
+.result-label { font-size: 14px; color: #185fa5; margin-bottom: 4px; }
+.result-dose { font-size: 26px; font-weight: 500; color: #0c447c; }
+.result-note { font-size: 14px; color: #185fa5; margin-top: 4px; }
+.warn-box { background: #faeeda; border: 0.5px solid #fac775; border-radius: var(--border-radius-md); padding: 12px 16px; margin-top: 10px; font-size: 14px; color: #633806; }
+.sec-head { font-size: 17px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 12px; }
+select, input[type=range] { width: 100%; }
+select { padding: 9px 12px; font-size: 15px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); }
+.slider-row { display: flex; align-items: center; gap: 10px; }
+.slider-row input { flex: 1; }
+.slider-val { min-width: 60px; text-align: right; font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .risk-grid { grid-template-columns: 1fr; } .two-col { grid-template-columns: 1fr; } .calc-row { grid-template-columns: 1fr; } }
+</style>
+
+<div class="app">
+<h2 class="sr-only">Ledraxen (Enoxaparin Sodium) interactive dosing guide for physicians</h2>
+
+<div class="header">
+  <div class="logo">
+    <svg viewBox="0 0 22 22" fill="none"><polygon points="11,2 20,20 2,20" fill="white" opacity="0.9"/><polygon points="11,6 17,18 11,18" fill="#1a6bb5"/></svg>
+  </div>
+  <div>
+    <div class="brand">Ledraxen® <span>Enoxaparin Sodium — Venipharm</span></div>
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px;">2000 IU / 4000 IU / 6000 IU · Clinical Dosing Reference</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('prophylaxis')">VTE Prophylaxis</div>
+  <div class="tab" onclick="showTab('therapeutic')">Therapeutic</div>
+  <div class="tab" onclick="showTab('obstetric')">Obstetric</div>
+  <div class="tab" onclick="showTab('calculator')">Dose Calculator</div>
+</div>
+
+<!-- VTE PROPHYLAXIS -->
+<div id="tab-prophylaxis" class="section active">
+  <div class="card">
+    <div class="card-title">Surgical prophylaxis</div>
+    <div class="risk-grid">
+      <div class="risk-card risk-low">
+        <div class="risk-title">Moderate risk</div>
+        <div class="risk-dose">Ledraxen® 2000 IU/day SC</div>
+        <div class="risk-note">2h pre-op, then 12h post-op · 7–10 days</div>
+      </div>
+      <div class="risk-card risk-mod">
+        <div class="risk-title">High risk</div>
+        <div class="risk-dose">Ledraxen® 4000 IU/day SC</div>
+        <div class="risk-note">12h pre-op, then 12h post-op · 7–10 days up to 30 days</div>
+      </div>
+      <div class="risk-card risk-high">
+        <div class="risk-title">Critical ill</div>
+        <div class="risk-dose">Ledraxen® 4000 IU/day SC</div>
+        <div class="risk-note">6–14 days until fully ambulatory</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Renal impairment — prophylactic dose adjustment</div>
+    <table class="dose-table">
+      <thead><tr><th>Indication</th><th>Standard dosing</th><th>Severe renal impairment</th></tr></thead>
+      <tbody>
+        <tr><td>Moderate risk surgical</td><td>Ledraxen® 2000 IU/day SC<br><small style="color:var(--color-text-secondary)">2h pre-op → 12h post-op · 7–10d</small></td><td>Ledraxen® 2000 IU/day SC<br><small style="color:var(--color-text-secondary)">Same schedule</small></td></tr>
+        <tr><td>High risk surgical</td><td>Ledraxen® 4000 IU/day SC<br><small style="color:var(--color-text-secondary)">12h pre-op → 12h post-op · 7–30d</small></td><td>Ledraxen® 2000 IU/day SC<br><small style="color:var(--color-text-secondary)">Same schedule</small></td></tr>
+        <tr><td>Critical ill patients</td><td>Ledraxen® 4000 IU/day SC<br><small style="color:var(--color-text-secondary)">6–14d until ambulatory</small></td><td>Ledraxen® 2000 IU/day SC<br><small style="color:var(--color-text-secondary)">6–14d until ambulatory</small></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">VTE risk factors checklist</div>
+    <div class="two-col">
+      <div>
+        <div style="font-size:14px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;">Patient-related</div>
+        <div id="patient-factors" style="font-size:15px;line-height:2;color:var(--color-text-primary)">
+          <label><input type="checkbox" onchange="countRisk()"> Active cancer / cancer treatment</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Age > 60</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Dehydration</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Known thrombophilia</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Obesity (BMI > 30)</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Significant medical comorbidities</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Personal / FH of VTE</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> HRT use</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Estrogen contraceptive use</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Varicose veins with phlebitis</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Pregnancy / &lt; 6 weeks postpartum</label>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;">Admission-related</div>
+        <div style="font-size:15px;line-height:2;color:var(--color-text-primary)">
+          <label><input type="checkbox" onchange="countRisk()"> Reduced mobility ≥ 3 days</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Hip or knee replacement</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Hip fracture</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Anaesthetic + surgical time > 90 min</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Pelvic/lower limb surgery > 60 min</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Acute surgical/intra-abdominal</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Critical care admission</label><br>
+          <label><input type="checkbox" onchange="countRisk()"> Surgery with significant immobility</label>
+        </div>
+        <div id="risk-result" style="margin-top:12px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THERAPEUTIC -->
+<div id="tab-therapeutic" class="section">
+  <div class="card">
+    <div class="card-title">Standard therapeutic dosing</div>
+    <table class="dose-table">
+      <thead><tr><th>Indication</th><th>Standard dosing</th><th>Severe renal impairment</th></tr></thead>
+      <tbody>
+        <tr><td>General therapeutic</td><td>Ledraxen® 100 IU/kg SC <span class="badge badge-blue">twice daily</span></td><td>Ledraxen® 100 IU/kg SC <span class="badge badge-amber">once daily</span></td></tr>
+        <tr>
+          <td>Acute STEMI <br><small style="color:var(--color-text-secondary)">&lt; 75 years</small></td>
+          <td>Ledraxen® 3000 IU single IV bolus + 100 IU/kg SC, then 100 IU/kg SC twice daily<br><small style="color:var(--color-text-secondary)">Max 10 000 IU for each of the first 2 SC doses</small></td>
+          <td>Ledraxen® 3000 IU single IV bolus + 100 IU/kg SC, then 100 IU/kg SC once daily<br><small style="color:var(--color-text-secondary)">Max 10 000 IU for first SC dose</small></td>
+        </tr>
+        <tr>
+          <td>Acute STEMI <br><small style="color:var(--color-text-secondary)">≥ 75 years</small></td>
+          <td>Ledraxen® 75 IU/kg SC twice daily — no initial bolus<br><small style="color:var(--color-text-secondary)">Max 7500 IU for each of first 2 SC doses</small></td>
+          <td>Ledraxen® 100 IU/kg SC once daily — no initial bolus<br><small style="color:var(--color-text-secondary)">Max 10 000 IU for first SC dose</small></td>
+        </tr>
+        <tr>
+          <td>Unstable angina / NQWMI</td>
+          <td>Ledraxen® 100 IU/kg SC twice daily + ASA 100–325 mg once daily</td>
+          <td>Ledraxen® 100 IU/kg SC once daily + ASA 100–325 mg once daily</td>
+        </tr>
+        <tr>
+          <td>PCI (percutaneous coronary intervention)</td>
+          <td colspan="2" style="color:var(--color-text-secondary);font-size:12px;">
+            Last SC &lt; 8h before balloon: <b style="color:var(--color-text-primary)">no additional dose needed</b><br>
+            Last SC &gt; 8h before balloon: <b style="color:var(--color-text-primary)">add Ledraxen® 30 IU/kg IV bolus</b>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Hemodialysis — thrombus prevention</div>
+    <table class="dose-table">
+      <thead><tr><th>Patient type</th><th>Access</th><th>Dose</th></tr></thead>
+      <tbody>
+        <tr><td>Standard (4h session)</td><td>Any</td><td>Ledraxen® 100 IU/kg into arterial line at start. If fibrin ring appears: add 50–100 IU/kg</td></tr>
+        <tr><td rowspan="2">High bleeding risk</td><td>Single vascular</td><td>Ledraxen® 75 IU/kg into arterial line at start</td></tr>
+        <tr><td>Double vascular</td><td>Ledraxen® 50 IU/kg into arterial line at start</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- OBSTETRIC -->
+<div id="tab-obstetric" class="section">
+  <div class="card">
+    <div class="card-title">Antenatal VTE prophylaxis — RCOG Green-top Guideline No. 37a</div>
+    <table class="dose-table">
+      <thead><tr><th>Risk level</th><th>Trigger</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-red">High risk</span></td><td>Any previous VTE (except single post-major surgery event)</td><td>Ledraxen® antenatal prophylaxis from booking</td></tr>
+        <tr><td><span class="badge badge-amber">Intermediate</span></td><td>Hospital admission · single previous VTE (post-surgery) · high-risk thrombophilia + no VTE · medical comorbidities · surgical procedure · OHSS (1st trimester)</td><td>Consider Ledraxen® antenatal prophylaxis</td></tr>
+        <tr><td><span class="badge badge-blue">Lower — ≥ 4 factors</span></td><td>Obesity · age > 35 · parity ≥ 3 · smoker · varicose veins · pre-eclampsia · immobility · FH of VTE · low-risk thrombophilia · multiple pregnancy · IVF/ART</td><td>Ledraxen® prophylaxis from first trimester</td></tr>
+        <tr><td><span class="badge badge-blue">Lower — 3 factors</span></td><td colspan="1">Same minor factors</td><td>Ledraxen® prophylaxis from 28 weeks</td></tr>
+        <tr><td><span class="badge badge-green">Lower — 0–2 factors</span></td><td colspan="1">Same minor factors</td><td>Ledraxen® prophylaxis if admitted to hospital</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Postnatal VTE prophylaxis</div>
+    <table class="dose-table">
+      <thead><tr><th>Risk level</th><th>Trigger</th><th>Duration</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-red">High risk</span></td><td>Any previous VTE · required antenatal LMWH · high-risk thrombophilia · low-risk thrombophilia + FHx</td><td>Ledraxen® ≥ 6 weeks postnatal</td></tr>
+        <tr><td><span class="badge badge-amber">Intermediate</span></td><td>Caesarean in labour · BMI ≥ 40 · readmission/prolonged puerperium · puerperium surgery · medical comorbidities</td><td>Ledraxen® ≥ 10 days postnatal</td></tr>
+        <tr><td><span class="badge badge-blue">> 2 factors</span></td><td>Age > 35 · obesity · parity ≥ 3 · smoker · elective CS · FH of VTE · varicose veins · infection · immobility · pre-eclampsia · multiple pregnancy · preterm/stillbirth · operative delivery · prolonged labour · PPH > 1L</td><td>Ledraxen® 10 days postnatal<br><small style="color:var(--color-text-secondary)">If > 3 factors: consider 4–6 weeks</small></td></tr>
+        <tr><td><span class="badge badge-green">&lt; 2 factors</span></td><td colspan="1">Same minor factors</td><td>Mobilisation + avoid dehydration</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Weight-based Ledraxen® dosing (ante- and postnatal)</div>
+    <table class="dose-table">
+      <thead><tr><th>Weight</th><th>Ledraxen® dose</th></tr></thead>
+      <tbody>
+        <tr><td>&lt; 50 kg</td><td>Ledraxen® 2000 IU SC once daily</td></tr>
+        <tr><td>50–90 kg</td><td>Ledraxen® 4000 IU SC once daily</td></tr>
+        <tr><td>91–130 kg</td><td>Ledraxen® 6000 IU SC once daily</td></tr>
+        <tr><td>131–170 kg</td><td>Ledraxen® 8000 IU SC once daily</td></tr>
+        <tr><td>&gt; 170 kg</td><td>Ledraxen® 60 IU/kg/day SC</td></tr>
+      </tbody>
+    </table>
+    <div class="warn-box" style="margin-top:10px;">
+      <b>Recurrent abortion — acquired thrombophilia (APS):</b> Ledraxen® 4000 IU SC once daily + 75 mg aspirin daily · from positive pregnancy test until ≥ 34 weeks gestation
+    </div>
+  </div>
+</div>
+
+<!-- CALCULATOR -->
+<div id="tab-calculator" class="section">
+  <div class="card">
+    <div class="card-title">Therapeutic dose calculator</div>
+    <div style="margin-bottom:14px;">
+      <div class="field-label">Patient weight (kg)</div>
+      <div class="slider-row">
+        <input type="range" min="30" max="200" value="70" step="1" id="weight-slider" oninput="calcDose()">
+        <span class="slider-val" id="weight-display">70 kg</span>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="field-label">Indication</div>
+      <select id="indication" onchange="calcDose()">
+        <option value="therapeutic">General therapeutic (DVT/PE treatment)</option>
+        <option value="stemi_lt75">Acute STEMI — patient &lt; 75 years</option>
+        <option value="stemi_ge75">Acute STEMI — patient ≥ 75 years</option>
+        <option value="ua_nqwmi">Unstable angina / NQWMI</option>
+      </select>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="field-label">Renal function</div>
+      <select id="renal" onchange="calcDose()">
+        <option value="normal">Normal / mild-moderate impairment</option>
+        <option value="severe">Severe renal impairment (CrCl &lt; 30 mL/min)</option>
+      </select>
+    </div>
+    <div id="calc-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Obstetric weight-based dose guide</div>
+    <div style="margin-bottom:14px;">
+      <div class="field-label">Patient weight (kg)</div>
+      <div class="slider-row">
+        <input type="range" min="30" max="220" value="70" step="1" id="obs-weight" oninput="calcObs()">
+        <span class="slider-val" id="obs-weight-display">70 kg</span>
+      </div>
+    </div>
+    <div id="obs-result"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function countRisk() {
+  const all = document.querySelectorAll('#tab-prophylaxis input[type=checkbox]');
+  let count = 0;
+  all.forEach(cb => { if (cb.checked) count++; });
+  const res = document.getElementById('risk-result');
+  if (count === 0) { res.style.display = 'none'; return; }
+  res.style.display = 'block';
+  let html = '', cls = '';
+  if (count === 1) { cls = 'risk-low'; html = '<div class="risk-card risk-low"><div class="risk-title">1 risk factor</div><div class="risk-dose" style="font-size:13px">Consider mobilisation<br>and hydration</div></div>'; }
+  else if (count < 4) { cls = 'risk-mod'; html = '<div class="risk-card risk-mod"><div class="risk-title">' + count + ' risk factors</div><div class="risk-dose" style="font-size:13px">High risk: consider<br>LMWH prophylaxis</div></div>'; }
+  else { cls = 'risk-high'; html = '<div class="risk-card risk-high"><div class="risk-title">' + count + ' risk factors</div><div class="risk-dose" style="font-size:13px">Very high risk:<br>LMWH indicated</div></div>'; }
+  res.innerHTML = html;
+}
+
+function calcDose() {
+  const w = parseInt(document.getElementById('weight-slider').value);
+  document.getElementById('weight-display').textContent = w + ' kg';
+  const ind = document.getElementById('indication').value;
+  const renal = document.getElementById('renal').value;
+  const severe = renal === 'severe';
+  let lines = [];
+  if (ind === 'therapeutic') {
+    const freq = severe ? 'once daily' : 'twice daily';
+    const dose = Math.round(w * 100);
+    lines.push({ label: '100 IU/kg SC ' + freq, dose: 'Ledraxen® ' + dose + ' IU SC ' + freq });
+  } else if (ind === 'stemi_lt75') {
+    const sc_dose = Math.round(w * 100);
+    const capped = Math.min(sc_dose, 10000);
+    const freq = severe ? 'once daily' : 'twice daily';
+    lines.push({ label: 'Initial IV bolus', dose: 'Ledraxen® 3000 IU IV (single bolus)' });
+    lines.push({ label: '100 IU/kg SC (first dose, max 10 000 IU)', dose: 'Ledraxen® ' + capped + ' IU SC' });
+    lines.push({ label: 'Maintenance ' + freq, dose: 'Ledraxen® ' + capped + ' IU SC ' + freq });
+  } else if (ind === 'stemi_ge75') {
+    if (!severe) {
+      const d = Math.min(Math.round(w * 75), 7500);
+      lines.push({ label: '75 IU/kg SC twice daily (no bolus, max 7500 IU)', dose: 'Ledraxen® ' + d + ' IU SC twice daily' });
+    } else {
+      const d = Math.min(Math.round(w * 100), 10000);
+      lines.push({ label: '100 IU/kg SC once daily (no bolus, max 10 000 IU)', dose: 'Ledraxen® ' + d + ' IU SC once daily' });
+    }
+  } else if (ind === 'ua_nqwmi') {
+    const d = Math.round(w * 100);
+    const freq = severe ? 'once daily' : 'twice daily';
+    lines.push({ label: '100 IU/kg SC ' + freq + ' + ASA 100–325 mg/day', dose: 'Ledraxen® ' + d + ' IU SC ' + freq });
+  }
+  let html = '<div class="result-box">';
+  html += '<div class="result-label">Calculated dose' + (severe ? ' — severe renal impairment' : '') + '</div>';
+  lines.forEach(l => {
+    html += '<div class="result-dose">' + l.dose + '</div>';
+    html += '<div class="result-note">' + l.label + '</div>';
+  });
+  html += '</div>';
+  if (severe) html += '<div class="warn-box">Severe renal impairment: frequency reduced to once daily to avoid accumulation.</div>';
+  document.getElementById('calc-result').innerHTML = html;
+}
+
+function calcObs() {
+  const w = parseInt(document.getElementById('obs-weight').value);
+  document.getElementById('obs-weight-display').textContent = w + ' kg';
+  let dose = '', note = '';
+  if (w < 50) { dose = 'Ledraxen® 2000 IU SC once daily'; note = 'Weight < 50 kg'; }
+  else if (w <= 90) { dose = 'Ledraxen® 4000 IU SC once daily'; note = 'Weight 50–90 kg'; }
+  else if (w <= 130) { dose = 'Ledraxen® 6000 IU SC once daily'; note = 'Weight 91–130 kg'; }
+  else if (w <= 170) { dose = 'Ledraxen® 8000 IU SC once daily'; note = 'Weight 131–170 kg'; }
+  else { dose = 'Ledraxen® ' + Math.round(w * 60) + ' IU/day SC'; note = '60 IU/kg/day — weight > 170 kg'; }
+  document.getElementById('obs-result').innerHTML = '<div class="result-box"><div class="result-label">' + note + '</div><div class="result-dose">' + dose + '</div></div>';
+}
+
+calcDose();
+calcObs();
+</script>
